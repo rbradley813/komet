@@ -274,6 +274,46 @@
                     </execution>
                 </executions>
             </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>plugin-service-loader</id>
+                            <goals>
+                                <goal>copy</goal>
+                            </goals>
+                            <phase>prepare-package</phase>
+                            <configuration>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>dev.ikm</groupId>
+                                        <artifactId>plugin-service-loader</artifactId>
+                                        <version>${plugin-service-loader.version}</version>
+                                    </artifactItem>
+                                </artifactItems>
+                                <outputDirectory>${project.build.directory}/plugin-service-loader</outputDirectory>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>add-plugins</id>
+                            <goals>
+                                <goal>copy</goal>
+                            </goals>
+                            <phase>prepare-package</phase>
+                            <configuration>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>dev.ikm.plugins</groupId>
+                                        <artifactId>identicon-lifehash-plugin</artifactId>
+                                        <version>1.0.0-SNAPSHOT</version>
+                                    </artifactItem>
+                                </artifactItems>
+                                <outputDirectory>${project.build.directory}/plugins</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
         </plugins>
     </build>
     <profiles>

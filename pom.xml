@@ -108,6 +108,7 @@
         <nsmenufx.version>3.1.0</nsmenufx.version>
         <openjfx.version>21.0.4</openjfx.version>
         <scenic-view.version>11.0.2</scenic-view.version>
+        <plugin-service-loader.version>3.0.1-SNAPSHOT</plugin-service-loader.version>
     </properties>
 
     <dependencyManagement>
