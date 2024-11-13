@@ -9,6 +9,17 @@
     <artifactId>kview</artifactId>
     <dependencies>
         <dependency>
+            <groupId>dev.ikm</groupId>
+            <artifactId>plugin-layer</artifactId>
+            <version>3.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.ikm.plugins</groupId>
+            <artifactId>identicon-api</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+<!--        ////////////-->
+        <dependency>
             <groupId>org.carlfx</groupId>
             <artifactId>cognitive</artifactId>
         </dependency>

@@ -30,11 +30,23 @@ module dev.ikm.komet.kview {
     requires dev.ikm.tinkar.composer;
     requires one.jpro.platform.auth.core;
 
+    ///
+    requires dev.ikm.tinkar.common;
+    requires dev.ikm.plugins.identicon.api;
+    requires dev.ikm.tinkar.plugin.service.boot;
+
+    uses dev.ikm.plugins.identicon.api.IdenticonPlugin;
+    uses dev.ikm.tinkar.common.service.PluginServiceLoader;
+    ///
+
     exports dev.ikm.komet.kview.state;
     exports dev.ikm.komet.kview.state.pattern;
 
     opens dev.ikm.komet.kview.mvvm.view.details to javafx.fxml, org.carlfx.cognitive;
     exports dev.ikm.komet.kview.mvvm.view.details;
+
+    opens dev.ikm.komet.kview.mvvm.view.helloworld to javafx.fxml, org.carlfx.cognitive;
+    exports dev.ikm.komet.kview.mvvm.view.helloworld;
 
     opens dev.ikm.komet.kview.mvvm.view.properties to javafx.fxml, org.carlfx.cognitive;
     exports dev.ikm.komet.kview.mvvm.view.properties;

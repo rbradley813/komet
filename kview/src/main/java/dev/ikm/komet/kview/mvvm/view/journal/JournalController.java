@@ -86,6 +86,8 @@ import dev.ikm.komet.kview.lidr.mvvm.viewmodel.LidrViewModel;
 import dev.ikm.komet.kview.mvvm.view.details.ConceptPreference;
 import dev.ikm.komet.kview.mvvm.view.details.DetailsNode;
 import dev.ikm.komet.kview.mvvm.view.details.DetailsNodeFactory;
+import dev.ikm.komet.kview.mvvm.view.helloworld.HelloWorldNode;
+import dev.ikm.komet.kview.mvvm.view.helloworld.HelloWorldNodeFactory;
 import dev.ikm.komet.kview.mvvm.view.navigation.ConceptPatternNavController;
 import dev.ikm.komet.kview.mvvm.view.pattern.PatternDetailsController;
 import dev.ikm.komet.kview.mvvm.view.progress.ProgressController;
@@ -866,6 +868,35 @@ public class JournalController {
         }
     }
 
+    private void makeHelloWorldWindow(ObservableViewNoOverride windowView, ConceptFacade conceptFacade, NidTextEnum nidTextEnum, Map<ConceptWindowSettings, Object> conceptWindowSettingsMap) {
+        // each detail window will publish on their own activity stream.
+        String uniqueDetailsTopic = "details-%s".formatted(conceptFacade.nid());
+        UUID uuid = UuidT5Generator.get(uniqueDetailsTopic);
+        final PublicIdStringKey<ActivityStream> detailsActivityStreamKey = new PublicIdStringKey(PublicIds.of(uuid.toString()), uniqueDetailsTopic);
+        ActivityStream detailActivityStream = ActivityStreams.create(detailsActivityStreamKey);
+        activityStreams.add(detailsActivityStreamKey);
+        KometNodeFactory helloWorldNodeFactory = new HelloWorldNodeFactory();
+        HelloWorldNode helloWorldNode = (HelloWorldNode) helloWorldNodeFactory.create(windowView,
+                detailsActivityStreamKey,
+                ActivityStreamOption.PUBLISH.keyForOption(),
+                AlertStreams.ROOT_ALERT_STREAM_KEY,
+                true,
+                journalTopic);
+
+        // This will refresh the Concept details, history, timeline
+        helloWorldNode.handleActivity(Lists.immutable.of(conceptFacade));
+
+        //Getting the concept window pane
+        Pane kometNodePanel = (Pane) helloWorldNode.getNode();
+        //Appling the CSS from draggable-region to the panel (makes it movable/sizable).
+        Set<Node> draggableToolbar = kometNodePanel.lookupAll(".draggable-region");
+        Node[] draggables = new Node[draggableToolbar.size()];
+
+        WindowSupport windowSupport = new WindowSupport(kometNodePanel, desktopSurfacePane, draggableToolbar.toArray(draggables));
+        //Adding the concept window panel as a child to the desktop pane.
+        desktopSurfacePane.getChildren().add(kometNodePanel);
+    }
+
     /**
      * TODO: This displays a blank concept window to allow user to Create a Concept.
      * @param windowView
@@ -1197,6 +1228,7 @@ public class JournalController {
                 if (conceptFacade == null) return;
 
                 makeConceptWindow(windowView, conceptFacade);
+                makeHelloWorldWindow(windowView, conceptFacade, NID_TEXT, null);
 
             }
         });
@@ -1448,6 +1480,7 @@ public class JournalController {
 
             //Calling make concept window to finish.
             makeConceptWindow(window, conceptFacade, nidTextEnum, conceptWindowSettingsMap);
+            makeHelloWorldWindow(window, conceptFacade, nidTextEnum, conceptWindowSettingsMap);
         }
     }
 
