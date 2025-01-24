@@ -33,9 +33,11 @@ module dev.ikm.komet.kview {
     ///
     requires dev.ikm.tinkar.common;
     requires dev.ikm.plugins.identicon.api;
+    requires dev.ikm.plugins.editing.api;
     requires dev.ikm.tinkar.plugin.service.boot;
 
     uses dev.ikm.plugins.identicon.api.IdenticonPlugin;
+    uses dev.ikm.plugins.editing.api.EditingPlugin;
     uses dev.ikm.tinkar.common.service.PluginServiceLoader;
     ///
 

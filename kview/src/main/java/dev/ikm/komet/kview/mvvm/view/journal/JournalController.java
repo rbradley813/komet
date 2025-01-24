@@ -110,11 +110,15 @@ import dev.ikm.komet.reasoner.ReasonerResultsNode;
 import dev.ikm.komet.reasoner.ReasonerResultsNodeFactory;
 import dev.ikm.komet.reasoner.StringWithOptionalConceptFacade;
 import dev.ikm.komet.search.SearchNode;
+import dev.ikm.plugin.layer.IkmServiceManager;
+import dev.ikm.plugins.editing.api.EditingPlugin;
+import dev.ikm.plugins.identicon.api.IdenticonPlugin;
 import dev.ikm.tinkar.common.alert.AlertStreams;
 import dev.ikm.tinkar.common.id.IntIds;
 import dev.ikm.tinkar.common.id.PublicId;
 import dev.ikm.tinkar.common.id.PublicIdStringKey;
 import dev.ikm.tinkar.common.id.PublicIds;
+import dev.ikm.tinkar.common.service.PluggableService;
 import dev.ikm.tinkar.common.service.PrimitiveData;
 import dev.ikm.tinkar.common.util.uuid.UuidT5Generator;
 import dev.ikm.tinkar.coordinate.stamp.calculator.LatestVersionSearchResult;
@@ -128,6 +132,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -143,6 +148,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
@@ -171,11 +177,14 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.image.BufferedImage;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -193,6 +202,10 @@ import java.util.prefs.BackingStoreException;
  */
 public class JournalController {
     private static final Logger LOG = LoggerFactory.getLogger(JournalController.class);
+
+    static {
+        IkmServiceManager.setPluginDirectory(Path.of("target/plugins"));
+    }
 
     @FXML
     private StackPane trayPaneContainer;
@@ -897,6 +910,44 @@ public class JournalController {
         desktopSurfacePane.getChildren().add(kometNodePanel);
     }
 
+    private void makePocWindow(ConceptFacade conceptFacade) {
+        // each detail window will publish on their own activity stream.
+        String uniqueDetailsTopic = "details-%s".formatted(conceptFacade.nid());
+        UUID uuid = UuidT5Generator.get(uniqueDetailsTopic);
+//        final PublicIdStringKey<ActivityStream> detailsActivityStreamKey = new PublicIdStringKey(PublicIds.of(uuid.toString()), uniqueDetailsTopic);
+//        ActivityStream detailActivityStream = ActivityStreams.create(detailsActivityStreamKey);
+//        activityStreams.add(detailsActivityStreamKey);
+//        KometNodeFactory helloWorldNodeFactory = new HelloWorldNodeFactory();
+//        HelloWorldNode helloWorldNode = (HelloWorldNode) helloWorldNodeFactory.create(windowView,
+//                detailsActivityStreamKey,
+//                ActivityStreamOption.PUBLISH.keyForOption(),
+//                AlertStreams.ROOT_ALERT_STREAM_KEY,
+//                true,
+//                journalTopic);
+//
+//        // This will refresh the Concept details, history, timeline
+//        helloWorldNode.handleActivity(Lists.immutable.of(conceptFacade));
+
+        ServiceLoader<EditingPlugin> editingPlugins = PluggableService.load(EditingPlugin.class);
+        LOG.info("Found {} Editing Plugins:", editingPlugins.stream().count());
+        editingPlugins.stream()
+                .map(ServiceLoader.Provider::get)
+                .forEach(javaFxIdenticonPlugin -> LOG.info(javaFxIdenticonPlugin.getName()));
+
+        EditingPlugin editingPlugin = editingPlugins.stream().map(ServiceLoader.Provider::get).findFirst().get();
+
+        //Getting the concept window pane
+        Pane kometNodePanel = editingPlugin.getPane(uuid);
+
+        //Appling the CSS from draggable-region to the panel (makes it movable/sizable).
+        Set<Node> draggableToolbar = kometNodePanel.lookupAll(".draggable-region");
+        Node[] draggables = new Node[draggableToolbar.size()];
+
+        WindowSupport windowSupport = new WindowSupport(kometNodePanel, desktopSurfacePane, draggableToolbar.toArray(draggables));
+        //Adding the concept window panel as a child to the desktop pane.
+        desktopSurfacePane.getChildren().add(kometNodePanel);
+    }
+
     /**
      * TODO: This displays a blank concept window to allow user to Create a Concept.
      * @param windowView
@@ -1228,7 +1279,8 @@ public class JournalController {
                 if (conceptFacade == null) return;
 
                 makeConceptWindow(windowView, conceptFacade);
-                makeHelloWorldWindow(windowView, conceptFacade, NID_TEXT, null);
+//                makeHelloWorldWindow(windowView, conceptFacade, NID_TEXT, null);
+                makePocWindow(conceptFacade);
 
             }
         });

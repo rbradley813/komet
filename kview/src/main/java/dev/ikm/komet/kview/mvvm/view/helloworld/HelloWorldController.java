@@ -189,9 +189,9 @@ public class HelloWorldController {
 
     private UUID conceptTopic;
 
-    static {
-        IkmServiceManager.setPluginDirectory(Path.of("target/plugins"));
-    }
+//    static {
+//        IkmServiceManager.setPluginDirectory(Path.of("target/plugins"));
+//    }
 
     public HelloWorldController() {
     }
