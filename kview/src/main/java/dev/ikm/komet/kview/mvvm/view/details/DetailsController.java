@@ -32,7 +32,9 @@ import dev.ikm.komet.kview.mvvm.view.stamp.StampEditController;
 import dev.ikm.komet.kview.mvvm.viewmodel.ConceptViewModel;
 import dev.ikm.komet.kview.mvvm.viewmodel.StampViewModel;
 import dev.ikm.komet.preferences.KometPreferences;
+import dev.ikm.plugins.identicon.api.IdenticonPlugin;
 import dev.ikm.tinkar.common.id.PublicId;
+import dev.ikm.tinkar.common.service.PluggableService;
 import dev.ikm.tinkar.coordinate.stamp.calculator.Latest;
 import dev.ikm.tinkar.coordinate.view.calculator.ViewCalculator;
 import dev.ikm.tinkar.entity.*;
@@ -40,12 +42,18 @@ import dev.ikm.tinkar.terms.*;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -60,11 +68,16 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferDouble;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -702,7 +715,35 @@ public class DetailsController  {
 
         // Identicon
         Image identicon = Identicon.generateIdenticonImage(entityFacade.publicId());
-        identiconImageView.setImage(identicon);
+
+        ServiceLoader<IdenticonPlugin> identiconPlugins = PluggableService.load(IdenticonPlugin.class);
+        System.out.println("Found " + identiconPlugins.stream().count() + " Identicon Plugins:");
+        identiconPlugins.stream()
+                .map(ServiceLoader.Provider::get)
+                .forEach(javaFxIdenticonPlugin -> System.out.println(javaFxIdenticonPlugin.getName()));
+        BufferedImage separator = new BufferedImage(32,4, BufferedImage.TRANSLUCENT);
+        AtomicReference<BufferedImage> image = new AtomicReference<>();
+        identiconPlugins.stream()
+                .map(ServiceLoader.Provider::get)
+                .forEach(javaFxIdenticonPlugin -> {
+                    BufferedImage newImage = (BufferedImage) javaFxIdenticonPlugin.getIdenticonImage(5,5, entityFacade.publicId(), (seed) -> seed.idString());
+                    java.awt.Image scaledImage = newImage.getScaledInstance(32, 32, java.awt.Image.SCALE_SMOOTH);
+                    newImage = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
+                    newImage.getGraphics().drawImage(scaledImage, 0, 0 , null);
+                    if (image.get() == null) {
+                        image.set(newImage);
+                    } else {
+//                        image.set(joinBufferedImage(joinBufferedImage(image.get(), separator), newImage));
+                        image.set(newImage);
+                    }
+                });
+        ImageView imageView = new ImageView(SwingFXUtils.toFXImage(image.get(), null));
+        imageView.setFitWidth(32);
+        imageView.setFitHeight(image.get().getHeight());
+
+        identiconImageView.setFitWidth(32);
+        identiconImageView.setFitHeight(image.get().getHeight());
+        identiconImageView.setImage(imageView.getImage());
 
         // Obtain STAMP info
         EntityVersion latestVersion = viewCalculator.latest(entityFacade).get();
@@ -730,6 +771,23 @@ public class DetailsController  {
         // Author tooltip
         authorTooltip.setText(stamp.author().description());
 
+    }
+
+    private BufferedImage joinBufferedImage(BufferedImage img1, BufferedImage img2) {
+        //int offset = 2;
+        int width = Math.max(img1.getWidth(), img2.getWidth());
+        int height = img1.getHeight() + img2.getHeight();
+        BufferedImage newImage = new BufferedImage(width, height,
+                BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = newImage.createGraphics();
+        Color oldColor = g2.getColor();
+        g2.setPaint(Color.WHITE);
+        g2.fillRect(0, 0, width, height);
+        g2.setColor(oldColor);
+        g2.drawImage(img1, null, 0, 0);
+        g2.drawImage(img2, null, 0, img1.getHeight());
+        g2.dispose();
+        return newImage;
     }
 
     private void updateStampViewModel(String mode, StampEntity stamp) {

@@ -211,6 +211,7 @@ public class HelloWorldController {
                         .map(ServiceLoader.Provider::get)
                         .forEach(javaFxIdenticonPlugin -> System.out.println(javaFxIdenticonPlugin.getName()));
 
+                ImageView separator = new ImageView(SwingFXUtils.toFXImage(new BufferedImage(32,4, BufferedImage.TRANSLUCENT), null));
                 identiconPlugins.stream()
                         .map(ServiceLoader.Provider::get)
                         .forEach(javaFxIdenticonPlugin -> {
@@ -219,6 +220,7 @@ public class HelloWorldController {
                             imageView.setFitHeight(32);
                             imageView.setFitWidth(32);
                             identiconVbox.getChildren().add(imageView);
+                            identiconVbox.getChildren().add(separator);
                         });
             }
         });

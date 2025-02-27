@@ -1280,7 +1280,7 @@ public class JournalController {
 
                 makeConceptWindow(windowView, conceptFacade);
 //                makeHelloWorldWindow(windowView, conceptFacade, NID_TEXT, null);
-                makePocWindow(conceptFacade);
+//                makePocWindow(conceptFacade);
 
             }
         });
@@ -1532,7 +1532,7 @@ public class JournalController {
 
             //Calling make concept window to finish.
             makeConceptWindow(window, conceptFacade, nidTextEnum, conceptWindowSettingsMap);
-            makeHelloWorldWindow(window, conceptFacade, nidTextEnum, conceptWindowSettingsMap);
+//            makeHelloWorldWindow(window, conceptFacade, nidTextEnum, conceptWindowSettingsMap);
         }
     }
 
