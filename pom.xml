@@ -5,7 +5,7 @@
     <parent>
         <groupId>dev.ikm.build</groupId>
         <artifactId>java-parent</artifactId>
-        <version>1.55.0</version>
+        <version>1.58.0</version>
         <relativePath/>
     </parent>
     <groupId>dev.ikm.komet</groupId>
@@ -70,7 +70,7 @@
         <!-- Tinkar Core Variables -->
         <tinkar-core.groupId>dev.ikm.tinkar</tinkar-core.groupId>
         <tinkar-composer.version>1.4.0</tinkar-composer.version>
-        <tinkar-core.version>1.82.0</tinkar-core.version>
+        <tinkar-core.version>1.87.0-java-23-updates-test-SNAPSHOT</tinkar-core.version>
 
         <!-- IKM Evrete Variables -->
         <ikm-evrete.groupId>org.evrete</ikm-evrete.groupId>
@@ -107,7 +107,7 @@
         <ikonli.version>12.2.0</ikonli.version>
         <javafx-maven-plugin.version>0.0.8</javafx-maven-plugin.version>
         <jpackage.version>1.6.0</jpackage.version>
-        <mockito.version>5.7.0</mockito.version>
+        <mockito.version>5.15.2</mockito.version>
         <nsmenufx.version>3.1.0</nsmenufx.version>
         <openjfx.version>23.0.1</openjfx.version>
         <scenic-view.version>11.0.2</scenic-view.version>
@@ -229,6 +229,11 @@
             <dependency>
                 <groupId>${tinkar-core.groupId}</groupId>
                 <artifactId>coordinate</artifactId>
+                <version>${tinkar-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${tinkar-core.groupId}</groupId>
+                <artifactId>component</artifactId>
                 <version>${tinkar-core.version}</version>
             </dependency>
             <dependency>
