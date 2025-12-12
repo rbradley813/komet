@@ -44,7 +44,9 @@
     <repositories>
         <repository>
             <id>tinkar-nexus</id>
-            <url>https://nexus.tinkar.org/ike-public/repo</url>
+            <url>https://nexus.tinkar.org/repository/ike-public/</url>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
         </repository>
     </repositories>
     <modules>
