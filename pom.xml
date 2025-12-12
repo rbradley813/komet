@@ -12,7 +12,6 @@
     <artifactId>komet-parent</artifactId>
     <name>KOMET</name>
     <version>1.58.0-progress-SNAPSHOT</version>
-    <!-- test change -->
     <packaging>pom</packaging>
     <inceptionYear>2015</inceptionYear>
     <licenses>
@@ -42,6 +41,12 @@
         <name>Integrated Knowledge Management</name>
         <url>http://www.ikm.dev</url>
     </organization>
+    <repositories>
+        <repository>
+            <id>tinkar-nexus</id>
+            <url>https://nexus.tinkar.org/ike-public/repo</url>
+        </repository>
+    </repositories>
     <modules>
         <module>komet-terms</module>
         <module>preferences</module>
@@ -629,13 +634,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
 
     <build>
         <pluginManagement>
